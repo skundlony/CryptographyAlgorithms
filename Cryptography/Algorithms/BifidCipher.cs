@@ -1,23 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cryptography.Helpers;
+﻿using Cryptography.Helpers;
 using Cryptography.Interface;
+using System;
 
 namespace Cryptography.Algorithms
 {
     public class BifidCipher : ICipher
     {
         private string _EncryptionKey;
-
-        private readonly char[,] _PolybiusSquare = new char[5, 5]
-        {
-            { 'B', 'G', 'W', 'K', 'Z' },
-            { 'Q', 'P', 'N', 'D', 'S' },
-            { 'I', 'O', 'A', 'X', 'E' },
-            { 'F', 'C', 'L', 'U', 'M' },
-            { 'T', 'H', 'Y', 'V', 'R' }
-        };
+        private PolybiusSquare _Scheme;
 
         public BifidCipher(string encryptionKey = "")
         {
@@ -27,17 +17,21 @@ namespace Cryptography.Algorithms
         private void UpdateKey(string keyword)
         {
             _EncryptionKey = keyword;
+            _Scheme = new PolybiusSquare(_EncryptionKey);
         }
 
         public void ChangeEnrcryptionKey(string keyword)
         {
             UpdateKey(keyword);
         }
+
         #region DECODE
+
         public string Decode(string value)
         {
             throw new NotImplementedException();
         }
+
         #endregion
 
         #region ENCODE
@@ -53,16 +47,17 @@ namespace Cryptography.Algorithms
 
         private int[,] EncodeGetLettersCords(string value)
         {
-            var markCords = new int[value.Length,2];
+            var markCords = new int[value.Length, 2];
             int index = 0;
+            var polybiusSquare = _Scheme.Get();
 
             foreach (var mark in value)
             {
-                for (int i = 0; i < _PolybiusSquare.GetLength(0); i++)
+                for (int i = 0; i < polybiusSquare.GetLength(0); i++)
                 {
-                    for (int j = 0; j < _PolybiusSquare.GetLength(1); j++)
+                    for (int j = 0; j < polybiusSquare.GetLength(1); j++)
                     {
-                        if(_PolybiusSquare[i,j] == mark)
+                        if (polybiusSquare[i, j] == mark)
                         {
                             markCords[index, 0] = i;
                             markCords[index, 1] = j;
@@ -101,7 +96,7 @@ namespace Cryptography.Algorithms
                 if (tempValue == -1)
                 {
                     tempValue = letterCords[currentIndex, dimensionIndex];
-                } 
+                }
                 else
                 {
                     var tempRow = $"{tempValue}{letterCords[currentIndex, dimensionIndex]}";
@@ -118,13 +113,14 @@ namespace Cryptography.Algorithms
         private string EncodeRows(int[] rows)
         {
             var encodedWord = new char[rows.Length];
+            var polybiusSquare = _Scheme.Get();
 
-            for(int i = 0; i<rows.Length; i++)
+            for (int i = 0; i < rows.Length; i++)
             {
                 var tempRowCords = rows[i].ToString().Length == 2 ? rows[i].ToString() : $"0{rows[i]}";
                 int firstCord = Int32.Parse(tempRowCords[0].ToString());
                 int secondCord = Int32.Parse(tempRowCords[1].ToString());
-                var letter = _PolybiusSquare[firstCord, secondCord];
+                var letter = polybiusSquare[firstCord, secondCord];
 
                 encodedWord[i] = letter;
             }
