@@ -4,7 +4,7 @@ using MoreLinq;
 
 namespace Cryptography.Helpers
 {
-    public class DictionaryHelper
+    public class CollectionsHelper
     {
         public static TKey GetKeyByValue<TKey, TValue>(TValue value, Dictionary<TKey, TValue> dict)
         {
@@ -20,5 +20,6 @@ namespace Cryptography.Helpers
 
             return default;
         }
+
     }
 }

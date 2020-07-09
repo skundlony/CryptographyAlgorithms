@@ -54,7 +54,7 @@ namespace Cryptography.Algorithms
 
             for(int i=0; i<splittedValue.Length; i++)
             {
-                decodedChars[i] = DictionaryHelper.GetKeyByValue(splittedValue[i], Scheme);
+                decodedChars[i] = CollectionsHelper.GetKeyByValue(splittedValue[i], Scheme);
             }
 
             return string.Join("", decodedChars).Trim();
