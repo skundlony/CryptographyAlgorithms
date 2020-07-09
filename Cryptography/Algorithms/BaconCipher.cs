@@ -1,14 +1,12 @@
 ﻿using Cryptography.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Cryptography.Interface;
+using System.Collections.Generic;
 
 namespace Cryptography.Algorithms
 {
     public class BaconCipher : ICipher
     {
+        private bool _IsDigitVersion = false;
         // I = J, U = V
         private static Dictionary<char, string> Scheme = new Dictionary<char, string>
         {
@@ -40,19 +38,34 @@ namespace Cryptography.Algorithms
             { 'Z', "BABBB" }
         };
 
-        public BaconCipher()
+        public void SwapNotation()
         {
-
+            if (_IsDigitVersion)
+            {
+                _IsDigitVersion = false;
+            }
+            else
+            {
+                _IsDigitVersion = true;
+            }
         }
 
-        //TODO: Add 0/1 switch
+        public BaconCipher(bool useDigitVersion = false)
+        {
+            _IsDigitVersion = useDigitVersion;
+        }
 
         public string Decode(string value)
         {
+            if (_IsDigitVersion)
+            {
+                ChangeNotation(ref value);
+            }
+
             var decodedChars = new char[value.Split(" ").Length];
             var splittedValue = value.ToUpper().Split(" ");
 
-            for(int i=0; i<splittedValue.Length; i++)
+            for (int i = 0; i < splittedValue.Length; i++)
             {
                 decodedChars[i] = CollectionsHelper.GetKeyByValue(splittedValue[i], Scheme);
             }
@@ -69,7 +82,7 @@ namespace Cryptography.Algorithms
             {
                 if (Scheme.ContainsKey(value[i]))
                 {
-                    encodedChars[i-linesSkipped] = Scheme[value[i]];
+                    encodedChars[i - linesSkipped] = Scheme[value[i]];
                 }
                 else
                 {
@@ -77,7 +90,26 @@ namespace Cryptography.Algorithms
                 }
             }
 
-            return string.Join(" ", encodedChars).Trim();
+            var result = string.Join(" ", encodedChars).Trim();
+
+            if(_IsDigitVersion)
+            {
+                ChangeNotation(ref result);
+            }
+
+            return result;
+        }
+
+        private void ChangeNotation(ref string value)
+        {
+            if (value.Contains('A'))
+            {
+                value = value.Replace('A', '0').Replace('B', '1');
+            } 
+            else if (value.Contains('0'))
+            {
+                value = value.Replace('0', 'A').Replace('1', 'B');
+            }
         }
     }
 }
