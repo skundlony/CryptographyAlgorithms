@@ -1,13 +1,13 @@
 ﻿using Cryptography.Helpers;
-using Cryptography.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cryptography.Interface;
 
 namespace Cryptography.Algorithms
 {
-    public class BaconCipher : Algorithm
+    public class BaconCipher : ICipher
     {
         // I = J, U = V
         private static Dictionary<char, string> Scheme = new Dictionary<char, string>
@@ -40,7 +40,14 @@ namespace Cryptography.Algorithms
             { 'Z', "BABBB" }
         };
 
-        public static string Decode(string value)
+        public BaconCipher()
+        {
+
+        }
+
+        //TODO: Add 0/1 switch
+
+        public string Decode(string value)
         {
             var decodedChars = new char[value.Split(" ").Length];
             var splittedValue = value.ToUpper().Split(" ");
@@ -53,7 +60,7 @@ namespace Cryptography.Algorithms
             return string.Join("", decodedChars).Trim();
         }
 
-        public static string Encode(string value)
+        public string Encode(string value)
         {
             var encodedChars = new string[value.Length];
             int linesSkipped = 0;
